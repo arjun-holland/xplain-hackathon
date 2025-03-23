@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        img {
+            max-width: 120px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Results</h1>
+    <table>
+        <tbody id="results-body">
+            <!-- Data will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+    <a href="{{ url_for('student_dashboard') }}" class="btn">Back to Search</a>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let results = JSON.parse(localStorage.getItem("searchResults"));
+    
+            if (!results || !results.items) {
+                document.body.innerHTML = "<p>No results found.</p>";
+                return;
+            }
+    
+            let table = `<table>
+                <tr>
+                    <th>Thumbnail</th>
+                    <th>Title</th>
+                    <th>Channel</th>
+                    <th>Published</th>
+                    <th>Link</th>
+                    <th>Download</th>
+                </tr>`;
+    
+            results.items.forEach(item => {
+                let videoId = item.id.videoId;
+                let snippet = item.snippet;
+                table += `<tr>
+                    <td><img src="${snippet.thumbnails.default.url}" width="120"></td>
+                    <td>${snippet.title}</td>
+                    <td>${snippet.channelTitle}</td>
+                    <td>${new Date(snippet.publishedAt).toLocaleDateString()}</td>
+                    <td><a href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Watch</a></td>
+                    <td><button onclick="downloadVideo('${videoId}')">Download</button></td>
+                </tr>`;
+            });
+    
+            table += "</table>";
+            document.body.innerHTML += table;
+        });
+    
+        function downloadVideo(videoId) {
+            window.location.href = `/download_video/${videoId}`;
+        }
+    </script>
+    
+</body>
+</html>
